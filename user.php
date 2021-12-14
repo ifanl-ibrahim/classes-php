@@ -93,7 +93,11 @@ class user {
 
 /////////////////////// disconnect
 
-
+    public function _disconnect () {
+        if (isset($_POST['deco'])) {
+            session_unset ();
+        }
+    }
 
 
 
