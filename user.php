@@ -155,5 +155,21 @@ class user {
         }
     }
 
- 
+/////////////////////// getLastname
+
+    public function _getLastname () {
+        $req = mysqli_query($connexion,'SELECT `lastname` FROM `utilisateurs`');
+        $res = mysqli_fetch_all($req);
+
+        echo "<th> lastname </th>";
+
+        foreach($res as $key=>$values) {
+            echo "<tr>";
+            foreach($values as $key=>$value) {
+                echo "<td> $value </td>";
+            }
+            echo "</tr>";
+        }
+    }
+}
 ?>
