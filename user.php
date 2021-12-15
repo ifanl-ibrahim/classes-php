@@ -87,7 +87,22 @@ class user {
         }
     }
 
- 
+/////////////////////// getAllInfos
+
+    public function _getAllInfos () {
+        $req = mysqli_query($connexion,'SELECT * FROM `utilisateurs`');
+        $res = mysqli_fetch_all($req);
+        
+        echo "<th> login </th> <th> password </th> <th> email </th> <th> firstname </th> <th> lastname </th>";
+        
+        foreach($res as $key=>$values) {
+            echo "<tr>";
+            foreach($values as $key=>$value) {
+                echo "<td> $value </td>";
+            }
+            echo "</tr>";
+        }
+    }
 
  
 
