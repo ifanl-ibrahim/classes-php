@@ -138,7 +138,22 @@ class user {
         }
     }
 
- 
+/////////////////////// getFirstname
+
+    public function _getFirstname () {
+        $req = mysqli_query($connexion,'SELECT `firstname` FROM `utilisateurs`');
+        $res = mysqli_fetch_all($req);
+    
+        echo "<th> firstname </th>";
+    
+        foreach($res as $key=>$values) {
+            echo "<tr>";
+            foreach($values as $key=>$value) {
+                echo "<td> $value </td>";
+            }
+            echo "</tr>";
+        }
+    }
 
  
 ?>
