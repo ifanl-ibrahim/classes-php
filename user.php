@@ -104,7 +104,22 @@ class user {
         }
     }
 
- 
+/////////////////////// getLogin
+
+    public function _getLogin () {
+        $req = mysqli_query($connexion,'SELECT `login` FROM `utilisateurs`');
+        $res = mysqli_fetch_all($req);
+        
+        echo "<th> login </th>";
+        
+        foreach($res as $key=>$values) {
+            echo "<tr>";
+            foreach($values as $key=>$value) {
+                echo "<td> $value </td>";
+            }
+            echo "</tr>";
+        }
+    }
 
  
 
