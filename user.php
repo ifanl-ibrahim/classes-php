@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 class user {
     private $id;
@@ -17,10 +17,10 @@ class user {
         session_start();
         $connexion = mysqli_connect('localhost', 'root', '', 'classes');
         $verif = mysqli_query($connexion, "SELECT login FROM `utilisateurs` WHERE login = '$login'");
-        
+
         if ($login && $email && $firstname && $lastname && $password) {
-            if(mysqli_num_rows($verif) == 0){  //calcule et verifie dans la base de donnée 
-                $query = "INSERT INTO `utilisateurs`(`login`, `password`, `email`, `firstname`, `lastname`) VALUES ($login, $password, $email, $firstname, $lastname)"; //ajoute les info dans la base de donnée
+            if(mysqli_num_rows($verif) == 0){  //calcule et verifie dans la base de donnée
+                $query = "INSERT INTO `utilisateurs`(`login`, `password`, `email`, `firstname`, `lastname`) VALUES ($login, $password, $email, $firstname, $lastname)";
                 mysqli_query($connexion, $query);
             }
         }
@@ -32,7 +32,7 @@ class user {
 
         foreach($res as $key=>$values) {
             echo "<tr>";
-            foreach($values as $key=>$value){
+            foreach($values as $key=>$value) {
                 echo "<td> $value </td>";
             }
             echo "</tr>";
@@ -50,12 +50,12 @@ class user {
             $query = mysqli_query($connexion, $req);
             $res = mysqli_fetch_array($query);
             $count = $res['count(*)'];
-        
-            if($count!=0) {  
+
+            if($count!=0) {
                 $_SESSION['login'] = $login;
             }
         }
-    }    
+    }
 
 /////////////////////// disconnect
 
@@ -73,12 +73,27 @@ class user {
         session_unset ( );
     }
 
+/////////////////////// update
 
+    public function _update ($login, $password, $email, $firstname, $lastname) {
+        session_start();
+        $connexion = mysqli_connect('localhost', 'root', '', 'classes');
 
+        $checklogin = mysqli_query($connexion, "SELECT * FROM utilisateurs WHERE login='$login'");
+        $query = "UPDATE `utilisateurs` SET `login`= $newLogin, `password`= $newpassword, `email`= $newemail, `firstname`= $newfirstname, `lastname`= $newlastname WHERE $login";
 
+        (mysqli_query($connexion, $query)) {
+            $_SESSION['login'] = $newLogin
+        }
+    }
 
+ 
 
+ 
 
+ 
 
-}
+ 
+
+ 
 ?>
