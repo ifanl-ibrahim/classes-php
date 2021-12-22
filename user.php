@@ -1,11 +1,12 @@
 <?php
 
 class user {
-    private $id;
-    public $login;
-    public $email;
-    public $firstname;
-    public $lastname;
+    private $_id;
+    public $_login;
+    public $_email;
+    public $_firstname;
+    public $_lastname;
+    private $_link;
 
 /////////////////////// construct
 
@@ -13,163 +14,162 @@ class user {
 
 /////////////////////// register
 
-    public function _register ($login, $password, $email, $firstname, $lastname) {
-        session_start();
-        $connexion = mysqli_connect('localhost', 'root', '', 'classes');
-        $verif = mysqli_query($connexion, "SELECT login FROM `utilisateurs` WHERE login = '$login'");
+    public function _register ($_login, $_password, $_email, $_firstname, $_lastname) {
+        $_login = htmlspecialchars($_login);
+        $_password = htmlspecialchars($_password);
+        $_email = htmlspecialchars($_email);
+        $_firstname = htmlspecialchars($_firstname);
+        $_lastname = htmlspecialchars($_lastname);
 
-        if ($login && $email && $firstname && $lastname && $password) {
-            if(mysqli_num_rows($verif) == 0){  //calcule et verifie dans la base de donnée
-                $query = "INSERT INTO `utilisateurs`(`login`, `password`, `email`, `firstname`, `lastname`) VALUES ($login, $password, $email, $firstname, $lastname)";
-                mysqli_query($connexion, $query);
-            }
-        }
+        $this->_login = $_login;
+        $this->_password = $_password;
+        $this->_email = $_email;
+        $this->_firstname = $_firstname;
+        $this->_lastname = $_lastname;
 
-        $req = mysqli_query($connexion,'SELECT `login`, `password`, `email`, `firstname`, `lastname` FROM `utilisateurs`');
-        $res = mysqli_fetch_all($req);
-
-        echo "<th> login </th> <th> password </th> <th> email </th> <th> firstname </th> <th> lastname </th>";
-
-        foreach($res as $key=>$values) {
-            echo "<tr>";
-            foreach($values as $key=>$value) {
-                echo "<td> $value </td>";
-            }
-            echo "</tr>";
-        }
+        $link = mysqli_connect('localhost','root','', 'classes');
+        $this->_link = $link;
+        $SQL = "INSERT INTO utilisateurs(login, password, email, firstname, lastname) VALUES ('$_login', '$_password', '$_email', '$_firstname', '$_lastname')";
+        mysqli_query($link,$SQL);
+        $query = mysqli_query($link, "SELECT * from utilisateurs WHERE login = '$_login'");
+        $resultat = mysqli_fetch_assoc($query);
+        return $resultat;
     }
 
 /////////////////////// connect
 
-    public function _connect ($login, $password) {
-        session_start();
-        $connexion = mysqli_connect('localhost', 'root', '', 'classes');
+    public function _connect ($_login, $_password) {
+        $_login = htmlspecialchars($_login);
+        $_password = htmlspecialchars($_password);
 
-        if($login && $password) {
-            $req = "SELECT count(*) FROM utilisateurs WHERE login = '$login' AND password='$password'";
-            $query = mysqli_query($connexion, $req);
-            $res = mysqli_fetch_array($query);
-            $count = $res['count(*)'];
+        $this->_login = $_login;
+        $this->_password = $_password;
 
-            if($count!=0) {
-                $_SESSION['login'] = $login;
+        $link = mysqli_connect('localhost','root','', 'classes');
+        $this->_link = $link;
+        $SQL = "SELECT * FROM utilisateurs WHERE login = '$_login'";
+        $query = mysqli_query($link, $SQL);
+        $resultat = mysqli_fetch_assoc($query);
+        
+        
+        if( $resultat == null) {
+            echo "il y a une erreur.";
+            $this->_disconnect();
+        }
+        else{
+            if($_password == $resultat['password']){
+                $this->_login = $resultat['login'];
+                $this->_password = $resultat['password'];
+                $this->_email = $resultat['email'];
+                $this->_firstname = $resultat['firstname'];
+                $this->_lastname = $resultat['lastname'];
+                echo 'vous êtes bien connecté ' . $_login;
+                return $resultat;
+            }else{
+                echo 'il y a une erreur.';
+                $this->_disconnect();
             }
         }
     }
 
 /////////////////////// disconnect
 
-    public function _disconnect () {
-        session_unset ();
+    public function _disconnect() {
+        $this->_login = '';
+        $this->_password = '';
+        $this->_email = '';
+        $this->_firstname = '';
+        $this->_lastname = '';
+        echo 'vous êtes bien déconnecté.';
     }
 
 /////////////////////// delete
 
     public function _delete () {
-        session_start();
-        $connexion = mysqli_connect('localhost', 'root', '', 'classes');
-        $login = $_SESSION['login'];
-        (mysqli_query($connexion, "DELETE FROM utilisateurs WHERE login = '$login'"));
-        session_unset ( );
+        $_login = $this->_login;
+        
+        $link = mysqli_connect('localhost','root','', 'classes');
+        $this->_link = $link;
+        $SQL = "DELETE FROM utilisateurs WHERE login = '$_login'";
+        mysqli_query($link, $SQL);
+            echo  'vous êtes bien mort.';
     }
 
 /////////////////////// update
 
-    public function _update ($login, $password, $email, $firstname, $lastname) {
-        session_start();
-        $connexion = mysqli_connect('localhost', 'root', '', 'classes');
+    public function _update ($_login, $_password, $_email, $_firstname, $_lastname) {
+        $_login = htmlspecialchars($_login);
+        $_password = htmlspecialchars($_password);
+        $_email = htmlspecialchars($_email);
+        $_firstname = htmlspecialchars($_firstname);
+        $_lastname = htmlspecialchars($_lastname);
 
-        $checklogin = mysqli_query($connexion, "SELECT * FROM utilisateurs WHERE login='$login'");
-        $query = "UPDATE `utilisateurs` SET `login`= $newLogin, `password`= $newpassword, `email`= $newemail, `firstname`= $newfirstname, `lastname`= $newlastname WHERE $login";
+        $_ancienlog = $this->_login;
+        $this->_login = $_login;
+        $this->_password = $_password;
+        $this->_email = $_email;
+        $this->_firstname = $_firstname;
+        $this->_lastname = $_lastname;
+        
+        $link = mysqli_connect('localhost','root','', 'classes');
+        $this->_link = $link;
+        $SQL = "UPDATE utilisateurs SET login='$_login', password='$_password', email='$_email', firstname='$_firstname', lastname='$_lastname' WHERE login ='$_ancienlog'";
+        echo $SQL;
+        mysqli_query($link, $SQL);
 
-        (mysqli_query($connexion, $query)) {
-            $_SESSION['login'] = $newLogin
+        echo '<br>les info ont bien été changé.';
+        
+    }
+
+/////////////////////// isConnected
+
+    public function _isConnected() {
+        // echo $this->_login;
+        if(!($this->_login == '')) {
+            return true;
+        }
+        else{
+            return false;
         }
     }
 
 /////////////////////// getAllInfos
 
     public function _getAllInfos () {
-        $req = mysqli_query($connexion,'SELECT * FROM `utilisateurs`');
-        $res = mysqli_fetch_all($req);
-        
-        echo "<th> login </th> <th> password </th> <th> email </th> <th> firstname </th> <th> lastname </th>";
-        
-        foreach($res as $key=>$values) {
-            echo "<tr>";
-            foreach($values as $key=>$value) {
-                echo "<td> $value </td>";
-            }
-            echo "</tr>";
-        }
+        $link = mysqli_connect('localhost','root','', 'classes');
+        $this->_link = $link;
+        $SQL = "SELECT * FROM utilisateurs";
+        $query = mysqli_query($link, $SQL);
+        $resultat = mysqli_fetch_assoc($query);
+        return ['login' => $this->_login,
+                'password' => $this->_password,
+                'email' => $this->_email,
+                'firstname' => $this->_firstname,
+                'lastname' => $this->_lastname];
     }
 
 /////////////////////// getLogin
 
     public function _getLogin () {
-        $req = mysqli_query($connexion,'SELECT `login` FROM `utilisateurs`');
-        $res = mysqli_fetch_all($req);
-        
-        echo "<th> login </th>";
-        
-        foreach($res as $key=>$values) {
-            echo "<tr>";
-            foreach($values as $key=>$value) {
-                echo "<td> $value </td>";
-            }
-            echo "</tr>";
-        }
+        return ['login' => $this->_login];
     }
 
 /////////////////////// getEmail
 
     public function _getEmail () {
-        $req = mysqli_query($connexion,'SELECT `email` FROM `utilisateurs`');
-        $res = mysqli_fetch_all($req);
-
-        echo "<th> email </th>";
-
-        foreach($res as $key=>$values) {
-            echo "<tr>";
-            foreach($values as $key=>$value) {
-                echo "<td> $value </td>";
-            }
-            echo "</tr>";
-        }
+        return ['email' => $this->_email];
     }
 
 /////////////////////// getFirstname
 
     public function _getFirstname () {
-        $req = mysqli_query($connexion,'SELECT `firstname` FROM `utilisateurs`');
-        $res = mysqli_fetch_all($req);
-    
-        echo "<th> firstname </th>";
-    
-        foreach($res as $key=>$values) {
-            echo "<tr>";
-            foreach($values as $key=>$value) {
-                echo "<td> $value </td>";
-            }
-            echo "</tr>";
-        }
+        return ['firstname' => $this->_firstname];
     }
 
 /////////////////////// getLastname
 
     public function _getLastname () {
-        $req = mysqli_query($connexion,'SELECT `lastname` FROM `utilisateurs`');
-        $res = mysqli_fetch_all($req);
-
-        echo "<th> lastname </th>";
-
-        foreach($res as $key=>$values) {
-            echo "<tr>";
-            foreach($values as $key=>$value) {
-                echo "<td> $value </td>";
-            }
-            echo "</tr>";
-        }
+        return ['lastname' => $this->_lastname];
     }
 }
 ?>
